@@ -2309,14 +2309,15 @@ function ChatPage(props: ChatPageProps) {
   const handleJumpDateSelect = useCallback((date: Date) => {
     if (!currentSessionId) return
     const targetDate = new Date(date)
-    const start = Math.floor(targetDate.setHours(0, 0, 0, 0) / 1000)
     const end = Math.floor(targetDate.setHours(23, 59, 59, 999) / 1000)
-    isDateJumpRef.current = true
+    // 日期跳转采用“锚点定位”而非“当天过滤”：
+    // 先定位到当日附近，再允许上下滚动跨天浏览。
+    isDateJumpRef.current = false
     setCurrentOffset(0)
-    setJumpStartTime(start)
+    setJumpStartTime(0)
     setJumpEndTime(end)
     setShowJumpPopover(false)
-    void loadMessages(currentSessionId, 0, start, end, true)
+    void loadMessages(currentSessionId, 0, 0, end, false)
   }, [currentSessionId, loadMessages])
 
   // 加载更晚的消息
