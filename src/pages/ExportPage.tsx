@@ -3761,24 +3761,12 @@ function ExportPage() {
     return sessions.reduce((count, session) => (session.avatarUrl ? count + 1 : count), 0)
   }, [sessions])
 
-  const visibleSelectedCount = useMemo(() => {
-    const visibleSet = new Set(
-      filteredContacts
-        .filter(contact => sessionRowByUsername.get(contact.username)?.hasSession)
-        .map(contact => contact.username)
-    )
-    let count = 0
-    for (const id of selectedSessions) {
-      if (visibleSet.has(id)) count += 1
-    }
-    return count
-  }, [filteredContacts, selectedSessions, sessionRowByUsername])
   const visibleSelectableCount = useMemo(() => (
     filteredContacts.reduce((count, contact) => (
       sessionRowByUsername.get(contact.username)?.hasSession ? count + 1 : count
     ), 0)
   ), [filteredContacts, sessionRowByUsername])
-  const isAllVisibleSelected = visibleSelectableCount > 0 && visibleSelectedCount === visibleSelectableCount
+  const isAllVisibleSelected = visibleSelectableCount > 0 && selectedCount === visibleSelectableCount
 
   const canCreateTask = exportDialog.scope === 'sns'
     ? Boolean(exportFolder)
@@ -4174,8 +4162,8 @@ function ExportPage() {
               )}
 
               {hasFilteredContacts && (
-                <>
-                  <div className="contacts-selection-toolbar">
+                <div className="contacts-list-header">
+                  <span className="contacts-list-header-select">
                     <button
                       className={`select-icon-btn ${isAllVisibleSelected ? 'checked' : ''}`}
                       type="button"
@@ -4185,6 +4173,8 @@ function ExportPage() {
                     >
                       {isAllVisibleSelected ? <CheckSquare size={16} /> : <Square size={16} />}
                     </button>
+                  </span>
+                  <span className="contacts-list-header-main">
                     <button
                       className="selection-toggle-btn"
                       type="button"
@@ -4193,35 +4183,31 @@ function ExportPage() {
                     >
                       {isAllVisibleSelected ? '取消全选当前筛选' : '全选当前筛选'}
                     </button>
-                    <span className="selection-summary muted">
-                      当前筛选 {visibleSelectedCount}/{visibleSelectableCount}
-                    </span>
-                    <button
-                      className="selection-clear-btn"
-                      type="button"
-                      onClick={clearSelection}
-                      disabled={selectedCount === 0}
-                    >
-                      清空
-                    </button>
+                    <span className="contacts-list-header-main-label">联系人（头像/名称/微信号）</span>
+                  </span>
+                  <span className="contacts-list-header-count">总消息数</span>
+                  <span className="contacts-list-header-actions">
                     {selectedCount > 0 && (
-                      <button
-                        className="selection-export-btn"
-                        type="button"
-                        onClick={openBatchExport}
-                      >
-                        <span>批量导出</span>
-                        <span className="selection-export-count">{selectedCount}</span>
-                      </button>
+                      <>
+                        <button
+                          className="selection-clear-btn"
+                          type="button"
+                          onClick={clearSelection}
+                        >
+                          清空
+                        </button>
+                        <button
+                          className="selection-export-btn"
+                          type="button"
+                          onClick={openBatchExport}
+                        >
+                          <span>批量导出</span>
+                          <span className="selection-export-count">{selectedCount}</span>
+                        </button>
+                      </>
                     )}
-                  </div>
-                  <div className="contacts-list-header">
-                    <span className="contacts-list-header-select">选择</span>
-                    <span className="contacts-list-header-main">联系人（头像/名称/微信号）</span>
-                    <span className="contacts-list-header-count">总消息数</span>
-                    <span className="contacts-list-header-actions">操作</span>
-                  </div>
-                </>
+                  </span>
+                </div>
               )}
             </div>
 
