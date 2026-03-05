@@ -1275,7 +1275,6 @@ function ExportPage() {
   const [hasSeededSnsStats, setHasSeededSnsStats] = useState(false)
   const [nowTick, setNowTick] = useState(Date.now())
   const [isContactsListAtTop, setIsContactsListAtTop] = useState(true)
-  const [isPageScrolled, setIsPageScrolled] = useState(false)
   const tabCounts = useContactTypeCountsStore(state => state.tabCounts)
   const isSharedTabCountsLoading = useContactTypeCountsStore(state => state.isLoading)
   const isSharedTabCountsReady = useContactTypeCountsStore(state => state.isReady)
@@ -1594,19 +1593,6 @@ function ExportPage() {
     if (!isExportRoute) return
     const timer = setInterval(() => setNowTick(Date.now()), 60 * 1000)
     return () => clearInterval(timer)
-  }, [isExportRoute])
-
-  useEffect(() => {
-    if (!isExportRoute) {
-      setIsPageScrolled(false)
-      return
-    }
-    const onWindowScroll = () => {
-      setIsPageScrolled(window.scrollY > 160)
-    }
-    onWindowScroll()
-    window.addEventListener('scroll', onWindowScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onWindowScroll)
   }, [isExportRoute])
 
   useEffect(() => {
@@ -3810,7 +3796,6 @@ function ExportPage() {
   const taskRunningCount = tasks.filter(task => task.status === 'running').length
   const taskQueuedCount = tasks.filter(task => task.status === 'queued').length
   const hasFilteredContacts = filteredContacts.length > 0
-  const showBackToTop = isPageScrolled || !isContactsListAtTop
   const closeTaskCenter = useCallback(() => {
     setIsTaskCenterOpen(false)
     setExpandedPerfTaskId(null)
@@ -3923,10 +3908,6 @@ function ExportPage() {
     showSessionDetailPanel,
     toggleSelectSession
   ])
-  const handleBackToTop = useCallback(() => {
-    contactsVirtuosoRef.current?.scrollToIndex({ index: 0, align: 'start', behavior: 'smooth' })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [])
   const handleContactsListWheelCapture = useCallback((event: WheelEvent<HTMLDivElement>) => {
     const deltaY = event.deltaY
     if (!deltaY) return
@@ -4562,16 +4543,6 @@ function ExportPage() {
           )}
         </div>
       </div>
-
-      {showBackToTop && (
-        <button
-          type="button"
-          className="back-to-top-btn"
-          onClick={handleBackToTop}
-        >
-          回到顶部
-        </button>
-      )}
 
       {exportDialog.open && createPortal(
         <div className="export-dialog-overlay" onClick={closeExportDialog}>
