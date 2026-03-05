@@ -1382,10 +1382,14 @@
     line-height: 1.2;
     color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 14px;
+  }
 
-    &.loading {
-      color: var(--text-tertiary);
-    }
+  .row-media-metric-icon {
+    color: var(--text-tertiary);
   }
 
   .row-message-stats {

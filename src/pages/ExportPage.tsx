@@ -4185,22 +4185,24 @@ function ExportPage() {
     const hintedMessages = normalizeMessageCount(matchedSession?.messageCountHint)
     const displayedMessageCount = countedMessages ?? hintedMessages
     const mediaMetric = sessionContentMetrics[contact.username]
-    const metricLoadingReady = canExport && isSessionCountStageReady
     const messageCountLabel = !canExport
       ? '--'
       : typeof displayedMessageCount === 'number'
         ? displayedMessageCount.toLocaleString('zh-CN')
         : '获取中'
-    const metricToLabel = (value: unknown): string => {
+    const metricToDisplay = (value: unknown): { state: 'value'; text: string } | { state: 'loading' } | { state: 'na'; text: '--' } => {
       const normalized = normalizeMessageCount(value)
-      if (!canExport) return '--'
-      if (!metricLoadingReady) return '--'
-      return typeof normalized === 'number' ? normalized.toLocaleString('zh-CN') : '...'
+      if (!canExport) return { state: 'na', text: '--' }
+      if (!isSessionCountStageReady) return { state: 'loading' }
+      if (typeof normalized === 'number') {
+        return { state: 'value', text: normalized.toLocaleString('zh-CN') }
+      }
+      return { state: 'loading' }
     }
-    const emojiLabel = metricToLabel(mediaMetric?.emojiMessages)
-    const voiceLabel = metricToLabel(mediaMetric?.voiceMessages)
-    const imageLabel = metricToLabel(mediaMetric?.imageMessages)
-    const videoLabel = metricToLabel(mediaMetric?.videoMessages)
+    const emojiMetric = metricToDisplay(mediaMetric?.emojiMessages)
+    const voiceMetric = metricToDisplay(mediaMetric?.voiceMessages)
+    const imageMetric = metricToDisplay(mediaMetric?.imageMessages)
+    const videoMetric = metricToDisplay(mediaMetric?.videoMessages)
     const openChatLabel = contact.type === 'friend'
       ? '打开私聊'
       : contact.type === 'group'
@@ -4256,16 +4258,32 @@ function ExportPage() {
             )}
           </div>
           <div className="row-media-metric">
-            <strong className={`row-media-metric-value ${emojiLabel === '...' ? 'loading' : ''}`}>{emojiLabel}</strong>
+            <strong className="row-media-metric-value">
+              {emojiMetric.state === 'loading'
+                ? <Loader2 size={12} className="spin row-media-metric-icon" aria-label="统计加载中" />
+                : emojiMetric.text}
+            </strong>
           </div>
           <div className="row-media-metric">
-            <strong className={`row-media-metric-value ${voiceLabel === '...' ? 'loading' : ''}`}>{voiceLabel}</strong>
+            <strong className="row-media-metric-value">
+              {voiceMetric.state === 'loading'
+                ? <Loader2 size={12} className="spin row-media-metric-icon" aria-label="统计加载中" />
+                : voiceMetric.text}
+            </strong>
           </div>
           <div className="row-media-metric">
-            <strong className={`row-media-metric-value ${imageLabel === '...' ? 'loading' : ''}`}>{imageLabel}</strong>
+            <strong className="row-media-metric-value">
+              {imageMetric.state === 'loading'
+                ? <Loader2 size={12} className="spin row-media-metric-icon" aria-label="统计加载中" />
+                : imageMetric.text}
+            </strong>
           </div>
           <div className="row-media-metric">
-            <strong className={`row-media-metric-value ${videoLabel === '...' ? 'loading' : ''}`}>{videoLabel}</strong>
+            <strong className="row-media-metric-value">
+              {videoMetric.state === 'loading'
+                ? <Loader2 size={12} className="spin row-media-metric-icon" aria-label="统计加载中" />
+                : videoMetric.text}
+            </strong>
           </div>
           <div className="row-action-cell">
             <div className="row-action-main">
