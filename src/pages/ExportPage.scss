@@ -1563,15 +1563,10 @@
 }
 
 .session-table-section {
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  background: var(--card-bg);
-  padding: 12px;
   flex: 0 0 auto;
   min-height: 420px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
   overflow: visible;
 }
 
